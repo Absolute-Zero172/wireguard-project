@@ -14,7 +14,7 @@ After setting up the account, navigate to "Create a Droplet". "Droplet" is the t
 Then, configure an ssh key pair to allow a secure ssh connection into the vm.
 - Use the command `ssh-keygen` to generate a public/private key pair
    - Follow all instructions given by this command
-- Upload the public key to the VM
+- Upload the public key to the VM before starting it
 
 SSH into the VM by using `ssh -i <path/to/private/key> root@<VM ipv4 address>` 
 
@@ -62,7 +62,7 @@ SSH into the VM by using `ssh -i <path/to/private/key> root@<VM ipv4 address>`
 
 ## Create Wireguard Image with Docker
 
-- Create the following directory structure with `mkdir -p wireguard/config`
+- Create the following directory structure with `mkdir -p wireguard/config` \
 ![file structure](./screenshots/file%20structure.png)
 - Make the file `wireguard/compose.yml` and paste the following code:
 ```yaml
@@ -96,6 +96,10 @@ services:
     sysctls:
       - net.ipv4.conf.all.src_valid_mark=1
 ```
+- Modify the commented areas:
+    - `TZ` is the timezone; consult [this page](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) for the proper format
+    - `SERVERURL` is the ip address of the cloud VM
+    - `PEERS` is the original number of clients to make configuration files for. For this project, we only need two devices, so two is set for peers.
 - Run `sudo docker compose up -d` while in the `wireguard` directory to start the image
    - The `-d` indicates to run in detached mode
    ![docker compose up](./screenshots/docker%20compose%20up.png)
@@ -108,12 +112,14 @@ services:
 - Download and install the proper wireguard client from the [wireguard website](https://www.wireguard.com/install/)
 - Get the peer configuration file from wireguard
     - In the `wireguard` directory in the VM, locate the `config/peer1` directory
-    - In the this directory, copy the `peer1.conf` file (highlighted in green)
+    - In this directory, copy the `peer1.conf` file (highlighted in green) to the windows machine
 
     ![configuration file](./screenshots/config%20file.png)
 
     - Use the `scp` command to use ssh to tranfer the file
-       - `scp -i <path/to/private/key> root@<VM ipv4 address>:</path/to/config/file> .`
+       ```sh
+       scp -i <path/to/private/key> root@<VM ipv4 address>:</path/to/config/file> .
+       ```
 - From the Wireguard client, add a tunnel from configuration file with the newly copied file
 - Click activate
 
@@ -133,5 +139,8 @@ After Connection: ![after connection](./screenshots/connect%20ip.png)
 - Scan the QR code downloaded from the server
 - Activate the VPN connection
 
-Before Connection: ![before connection](./screenshots/mobile%20disconnected.jpg)
-After Connection: ![after connection](./screenshots/mobile%20connected.jpg)
+Before Connection: \
+<img src="./screenshots/mobile%20disconnected.jpg" width=250 />
+
+After Connection: \
+<img src="./screenshots/mobile%20connected.jpg" width=250 />
